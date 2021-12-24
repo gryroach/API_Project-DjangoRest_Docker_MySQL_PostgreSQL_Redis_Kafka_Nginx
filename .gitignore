@@ -1,0 +1,4 @@
+/.env
+/.idea
+/venv
+drf_project/drf_app/migrations
