@@ -1,4 +1,5 @@
 import django.utils.datastructures
+from django.http import HttpResponseBadRequest
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
@@ -44,17 +45,22 @@ def sinch_post(request):
                     serializer.save()
                 else:
                     return Response(serializer.errors, status=400)
-    else:
+        return Response(data=f"All posts downloaded", status=200)
+    elif isinstance(response, dict):
         content = JSONRenderer().render(response)
         stream = io.BytesIO(content)
         data = JSONParser().parse(stream)
         serializer = JPHModelSerializer(data=data)
-        if response['id'] in list_of_id:
-            return Response(data=f"Post with id {response['id']} is already exist", status=200)
-        else:
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=200)
+        if 'id' in response:
+            if response['id'] in list_of_id:
+                return Response(data=f"Post with id {response['id']} is already exist", status=200)
             else:
-                return Response(status=400)
-    return Response(data=f"All posts downloaded", status=200)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=200)
+                else:
+                    return Response(status=400)
+        else:
+            return Response(data="API holder has no attribute 'id'", status=400)
+    else:
+        return Response(str(response.content).strip('\'b\''), status=400)
