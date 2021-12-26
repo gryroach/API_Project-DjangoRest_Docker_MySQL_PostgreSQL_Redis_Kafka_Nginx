@@ -1,9 +1,13 @@
+import io
+
 import requests
 import environ
 import os
 from json import JSONDecodeError
 
 from django.http import HttpResponseBadRequest
+from rest_framework.parsers import JSONParser
+from rest_framework.renderers import JSONRenderer
 
 root = environ.Path(__file__) - 3
 
@@ -25,3 +29,10 @@ def download_json():
         return HttpResponseBadRequest(f"Failed to get data from the server by {remote_url}.")
     except requests.exceptions.MissingSchema:
         return HttpResponseBadRequest("Invalid OPEN_API.")
+
+
+def response_to_json(response):
+    content = JSONRenderer().render(response)
+    stream = io.BytesIO(content)
+    data = JSONParser().parse(stream)
+    return data

@@ -6,6 +6,7 @@ class JPHModel(models.Model):
     id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=240)
     body = models.TextField()
+    update_date = models.DateTimeField(null=True)
 
     objects = models.Manager()
 
