@@ -17,7 +17,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./mysql_db:/var/lib/mysqldata
+      - ./mysql_db:/var/lib/mysql
     environment:
       MYSQL_DATABASE: db_django
       MYSQL_PASSWORD: root
