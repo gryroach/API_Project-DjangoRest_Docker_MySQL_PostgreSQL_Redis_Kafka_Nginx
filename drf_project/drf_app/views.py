@@ -40,7 +40,6 @@ class SinchPostView(APIView):
             for post in response:
                 data = response_to_json(post)
                 serializer = JPHModelSerializer(data=data)
-                print(list_of_id)
                 if post['id'] not in list_of_id:
                     if serializer.is_valid():
                         serializer.save()
