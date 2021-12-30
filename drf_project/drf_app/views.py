@@ -79,7 +79,7 @@ class SinchPostView(APIView):
                 print(list_of_id)
                 if post['id'] not in list_of_id:
                     if serializer.is_valid():
-                        serializer.save(update_date=datetime.datetime.now())
+                        serializer.save()
                     else:
                         return Response(serializer.errors, status=400)
                 else:
@@ -98,7 +98,7 @@ class SinchPostView(APIView):
                     return Response(data=f"Post with id={data['id']} downloaded", status=200)
                 else:
                     if serializer.is_valid():
-                        serializer.save(update_date=datetime.datetime.now())
+                        serializer.save()
                         return Response(serializer.data, status=200)
                     else:
                         return Response(serializer.errors, status=400)
@@ -107,8 +107,5 @@ class SinchPostView(APIView):
         else:
             return Response(str(response.content).strip('\'b\''), status=400)
 
-    # def perform_create(self, serializer):
-    #     serializer.save(update_date=datetime.datetime.now())
-    #
-    # def perform_update(self, serializer):
-    #     serializer.save()
+    def perform_create(self, serializer):
+        serializer.save(update_date=datetime.datetime.now())
