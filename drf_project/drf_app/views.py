@@ -60,32 +60,45 @@ def sinch_post(request):
 
 
 class SinchPostView(APIView):
+    def get_object(self, pk):
+        try:
+            return JPHModel.objects.get(pk=pk)
+        except JPHModel.DoesNotExist:
+            return False
+
     def get(self, request):
         posts = JPHModel.objects.all()
         list_of_id = []
         for post in posts:
             list_of_id.append(post.id)
-
         response = download_json()
         if isinstance(response, list):
             for post in response:
                 data = response_to_json(post)
                 serializer = JPHModelSerializer(data=data)
+                print(list_of_id)
                 if post['id'] not in list_of_id:
                     if serializer.is_valid():
-                        serializer.save()
+                        serializer.save(update_date=datetime.datetime.now())
                     else:
                         return Response(serializer.errors, status=400)
+                else:
+                    inst = self.get_object(post['id'])
+                    inst.update_date = datetime.datetime.now()
+                    inst.save()
             return Response(data=f"All posts downloaded", status=200)
         elif isinstance(response, dict):
             data = response_to_json(response)
             serializer = JPHModelSerializer(data=data)
             if 'id' in response:
                 if response['id'] in list_of_id:
-                    return Response(data=f"Post with id {response['id']} is already exist", status=200)
+                    inst = self.get_object(data['id'])
+                    inst.update_date = datetime.datetime.now()
+                    inst.save()
+                    return Response(data=f"Post with id={data['id']} downloaded", status=200)
                 else:
                     if serializer.is_valid():
-                        serializer.save()
+                        serializer.save(update_date=datetime.datetime.now())
                         return Response(serializer.data, status=200)
                     else:
                         return Response(serializer.errors, status=400)
@@ -94,5 +107,8 @@ class SinchPostView(APIView):
         else:
             return Response(str(response.content).strip('\'b\''), status=400)
 
-    def perform_create(self, serializer):
-        serializer.save(update_date=datetime.datetime.now())
+    # def perform_create(self, serializer):
+    #     serializer.save(update_date=datetime.datetime.now())
+    #
+    # def perform_update(self, serializer):
+    #     serializer.save()
