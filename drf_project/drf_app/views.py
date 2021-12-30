@@ -24,6 +24,9 @@ def mirror_text(request):
 
 
 class SinchPostView(APIView):
+    count_of_update = 0
+    last_update = 0
+
     def get_object(self, pk):
         return JPHModel.objects.get(pk=pk)
 
@@ -46,8 +49,11 @@ class SinchPostView(APIView):
                 else:
                     inst = self.get_object(post['id'])
                     inst.update_date = datetime.datetime.now()
+                    self.last_update = inst.update_date.strftime("%Y-%m-%d %H:%M:%S")
                     inst.save()
-            return Response(data=f"All posts downloaded", status=200)
+                    self.count_of_update += 1
+            return Response(data=f"{self.count_of_update} posts updated, "
+                                 f"last - {self.last_update}", status=200)
         elif isinstance(response, dict):
             data = response_to_json(response)
             serializer = JPHModelSerializer(data=data)
@@ -56,11 +62,13 @@ class SinchPostView(APIView):
                     inst = self.get_object(data['id'])
                     inst.update_date = datetime.datetime.now()
                     inst.save()
-                    return Response(data=f"Post with id={data['id']} downloaded", status=200)
+                    self.count_of_update += 1
+                    self.last_update = inst.update_date.strftime("%Y-%m-%d %H:%M:%S")
+                    return Response(data=f"Post with id = {data['id']} updated at {self.last_update}", status=200)
                 else:
                     if serializer.is_valid():
                         serializer.save()
-                        return Response(serializer.data, status=200)
+                        return Response(data=f"Post with id={data['id']} downloaded", status=200)
                     else:
                         return Response(serializer.errors, status=400)
             else:
