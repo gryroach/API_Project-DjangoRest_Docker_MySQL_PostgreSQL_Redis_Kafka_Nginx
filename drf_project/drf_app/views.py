@@ -6,6 +6,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.core import serializers
+import requests
+import json
+
 from .models import JPHModel
 from .serializers import MirrorSerializer, JPHModelSerializer
 from .utils import download_json, response_to_json
@@ -77,3 +81,27 @@ class SinchPostView(APIView):
 
     def perform_create(self, serializer):
         serializer.save(update_date=datetime.datetime.now())
+
+remote_url= 'https://jsonplaceholder.typicode.com/posts/'
+
+
+
+class SincView(APIView):
+    def get(self, request):
+        data = requests.get(remote_url)
+        # serializer = JPHModelSerializer(data=data, many=True)
+        posts = JPHModel.objects.all()
+        # serializer = JPHModelSerializer(data=posts)
+        # print(serializer)
+        print('!!!!!')
+        aaa = serializers.deserialize('json', json.loads(data.content))
+        print(aaa)
+        serializer = JPHModelSerializer(data=data.json())
+        print(serializer)
+        serializer.update_date = datetime.datetime.now()
+        print(serializer)
+        print(serializer.is_valid())
+        # print(json.loads(data.content))
+        # for deserialized_object in serializers.deserialize("json", serializer):
+        #     print(repr(deserialized_object))
+
