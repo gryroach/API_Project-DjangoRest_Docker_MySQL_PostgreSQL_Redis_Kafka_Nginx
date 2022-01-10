@@ -19,7 +19,7 @@ services:
     volumes:
       - ./mysql_db:/var/lib/mysql
     environment:
-      MYSQL_DATABASE: db_django
-      MYSQL_PASSWORD: root
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: MYSQL_DB
+      MYSQL_PASSWORD: MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
     restart: always
