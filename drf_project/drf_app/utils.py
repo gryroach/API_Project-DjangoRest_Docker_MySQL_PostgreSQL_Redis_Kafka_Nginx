@@ -8,7 +8,6 @@ from django.http import HttpResponseBadRequest
 from rest_framework.response import Response
 
 from .models import JPHModel
-from .serializers import JPHModelSerializer
 
 root = environ.Path(__file__) - 3
 
@@ -42,37 +41,7 @@ def sinc_posts(posts, ex_posts):
         posts = [posts]
     if not isinstance(posts, list):
         raise TypeError
-    ex_posts_dict = ex_posts.values()
-    for post in posts:
-        try:
-            inst_id = list(filter(lambda item: item['id'] == post['id'], ex_posts_dict))[0]['id']
-            inst = ex_posts[inst_id - 1]
-            serializer = JPHModelSerializer(instance=inst, data=post)
-            result['Number of updated posts'] += 1
-        except IndexError:
-            serializer = JPHModelSerializer(data=post)
-            result['Number of downloaded posts'] += 1
-        except KeyError:
-            return Response(data="There is no data on the remote API server", status=400)
-        if serializer.is_valid():
-            serializer.save()
-            result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        else:
-            return Response(serializer.errors, status=400)
-    return Response(result)
-
-
-def sinc_posts2(posts, ex_posts):
-    result = {
-        'Number of downloaded posts': 0,
-        'Number of updated posts': 0,
-        'Last update': ''
-    }
-    if isinstance(posts, dict):
-        posts = [posts]
-    if not isinstance(posts, list):
-        raise TypeError
-    data = []
+    new_data = []
     for post in posts:
         try:
             inst = list(filter(lambda item: getattr(item, 'id') == post['id'], ex_posts))[0]
@@ -80,22 +49,21 @@ def sinc_posts2(posts, ex_posts):
                 setattr(inst, key, value)
             inst.update_date = datetime.datetime.now()
             result['Number of updated posts'] += 1
+            result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         except IndexError:
-            data.append(post)
+            inst = JPHModel()
+            for (key, value) in post.items():
+                setattr(inst, key, value)
+            inst.update_date = datetime.datetime.now()
+            new_data.append(inst)
             result['Number of downloaded posts'] += 1
+            result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         except KeyError:
             return Response(data="There is no data on the remote API server", status=400)
 
-    JPHModel.objects.bulk_update(ex_posts, ['userId', 'title', 'body', 'update_date'])
+    JPHModel.objects.bulk_update_or_create(ex_posts, ['userId', 'title', 'body', 'update_date'], match_field='id')
+    JPHModel.objects.bulk_update_or_create(new_data, ['userId', 'title', 'body', 'update_date'], match_field='id')
 
-    # for new
-    serializer = JPHModelSerializer(data=data, many=True)
-    if serializer.is_valid():
-        serializer.save()
-    else:
-        return Response(serializer.errors, status=400)
-
-    result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     return Response(result)
 
 

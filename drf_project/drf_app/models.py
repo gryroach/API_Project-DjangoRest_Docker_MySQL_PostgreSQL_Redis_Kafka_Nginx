@@ -1,4 +1,5 @@
 from django.db import models
+from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
 
 class JPHModel(models.Model):
@@ -8,7 +9,7 @@ class JPHModel(models.Model):
     body = models.TextField()
     update_date = models.DateTimeField(null=True)
 
-    objects = models.Manager()
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
 
     class Meta:
         ordering = ["id"]

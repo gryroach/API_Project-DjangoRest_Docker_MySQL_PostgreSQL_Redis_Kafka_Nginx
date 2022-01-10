@@ -3,6 +3,7 @@ backports.zoneinfo==0.2.1
 certifi==2021.10.8
 charset-normalizer==2.0.9
 Django==4.0
+django-bulk-update-or-create==0.3.0
 django-environ==0.8.1
 djangorestframework==3.13.1
 idna==3.3
