@@ -7,7 +7,7 @@ from json import JSONDecodeError
 from django.http import HttpResponseBadRequest
 from rest_framework.response import Response
 
-from .models import JPHModel
+from .models import Post
 
 root = environ.Path(__file__) - 3
 
@@ -51,7 +51,7 @@ def sinc_posts(posts, ex_posts):
             result['Number of updated posts'] += 1
             result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         except IndexError:
-            inst = JPHModel()
+            inst = Post()
             for (key, value) in post.items():
                 setattr(inst, key, value)
             inst.update_date = datetime.datetime.now()
@@ -61,8 +61,8 @@ def sinc_posts(posts, ex_posts):
         except KeyError:
             return Response(data="There is no data on the remote API server", status=400)
 
-    JPHModel.objects.bulk_update_or_create(ex_posts, ['userId', 'title', 'body', 'update_date'], match_field='id')
-    JPHModel.objects.bulk_update_or_create(new_data, ['userId', 'title', 'body', 'update_date'], match_field='id')
+    Post.objects.bulk_update_or_create(ex_posts, ['userId', 'title', 'body', 'update_date'], match_field='id')
+    Post.objects.bulk_update_or_create(new_data, ['userId', 'title', 'body', 'update_date'], match_field='id')
 
     return Response(result)
 

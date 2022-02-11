@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import JPHModel
+from .models import Post
 from .serializers import MirrorSerializer
 from .utils import download_json, sinc_posts
 
@@ -25,7 +25,7 @@ class SinchPostView(APIView):
 
     def get(self, request):
         posts = download_json()
-        ex_posts = JPHModel.objects.all()
+        ex_posts = Post.objects.all()
         try:
             return sinc_posts(posts, ex_posts)
         except TypeError:
