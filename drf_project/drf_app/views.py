@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 
 from .models import Post
 from .serializers import MirrorSerializer
-from .utils import download_json, sinc_posts
+from .src.utils import download_json
+from .src.sync import sinc_posts
 
 posts_url = os.getenv('POSTS_API')
 authors_url = os.getenv('AUTHORS_API')
@@ -40,4 +41,5 @@ class SinchAuthorView(APIView):
 
     def get(self, request):
         authors = download_json(authors_url)
+
 

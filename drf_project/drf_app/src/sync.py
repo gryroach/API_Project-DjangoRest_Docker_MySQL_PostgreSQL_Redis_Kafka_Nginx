@@ -1,24 +1,6 @@
 import datetime
-import requests
-from json import JSONDecodeError
-
-from django.http import HttpResponseBadRequest
 from rest_framework.response import Response
-
-from .models import Post
-
-
-def download_json(url):
-    try:
-        return requests.request("GET", url).json()
-    except requests.exceptions.ConnectionError:
-        return HttpResponseBadRequest("The remote api server is not responded.")
-    except KeyError:
-        return HttpResponseBadRequest("The remote api server address is not valid.")
-    except JSONDecodeError:
-        return HttpResponseBadRequest(f"Failed to get data from the server by {url}.")
-    except requests.exceptions.MissingSchema:
-        return HttpResponseBadRequest("Invalid OPEN_API.")
+from ..models import Post
 
 
 def sinc_posts(posts, ex_posts):
@@ -29,8 +11,7 @@ def sinc_posts(posts, ex_posts):
     }
     if isinstance(posts, dict):
         posts = [posts]
-    if not isinstance(posts, list):
-        raise TypeError
+
     new_data = []
     for post in posts:
         try:
@@ -55,5 +36,3 @@ def sinc_posts(posts, ex_posts):
     Post.objects.bulk_update_or_create(new_data, ['userId', 'title', 'body', 'update_date'], match_field='id')
 
     return Response(result)
-
-
