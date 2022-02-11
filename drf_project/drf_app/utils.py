@@ -1,7 +1,5 @@
 import datetime
 import requests
-import environ
-import os
 from json import JSONDecodeError
 
 from django.http import HttpResponseBadRequest
@@ -9,24 +7,16 @@ from rest_framework.response import Response
 
 from .models import Post
 
-root = environ.Path(__file__) - 3
 
-env = environ.Env()
-environ.Env.read_env(os.path.join(root, '.env'))     # reading .env file
-
-# url open API holder
-remote_url = env.str('OPEN_API')
-
-
-def download_json():
+def download_json(url):
     try:
-        return requests.request("GET", remote_url).json()
+        return requests.request("GET", url).json()
     except requests.exceptions.ConnectionError:
         return HttpResponseBadRequest("The remote api server is not responded.")
     except KeyError:
         return HttpResponseBadRequest("The remote api server address is not valid.")
     except JSONDecodeError:
-        return HttpResponseBadRequest(f"Failed to get data from the server by {remote_url}.")
+        return HttpResponseBadRequest(f"Failed to get data from the server by {url}.")
     except requests.exceptions.MissingSchema:
         return HttpResponseBadRequest("Invalid OPEN_API.")
 
