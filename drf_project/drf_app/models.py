@@ -35,6 +35,8 @@ class Author(models.Model):
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, verbose_name='Company')
     update_date = models.DateTimeField(null=True)
 
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
+
     class Meta:
         ordering = ["id"]
 

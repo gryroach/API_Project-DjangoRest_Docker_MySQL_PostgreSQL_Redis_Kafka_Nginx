@@ -36,3 +36,15 @@ def sinc_posts(posts, ex_posts):
     Post.objects.bulk_update_or_create(new_data, ['userId', 'title', 'body', 'update_date'], match_field='id')
 
     return Response(result)
+
+
+def sync_authors(authors, ex_authors):
+    result = {
+        'Number of downloaded authors': 0,
+        'Number of updated authors': 0,
+        'Last update': ''
+    }
+    if isinstance(authors, dict):
+        authors = [authors]
+
+    new_data = []

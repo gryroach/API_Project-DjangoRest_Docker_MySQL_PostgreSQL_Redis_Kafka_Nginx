@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Post
+from .models import Post, Author
 from .serializers import MirrorSerializer
 from .src.utils import download_json
 from .src.sync import sinc_posts
@@ -41,5 +41,10 @@ class SinchAuthorView(APIView):
 
     def get(self, request):
         authors = download_json(authors_url)
+        ex_authors = Author.objects.all()
+        try:
+            return sinc_posts(authors, ex_authors)
+        except TypeError:
+            return Response(str(authors.content).strip('\'b\''), status=400)
 
 
