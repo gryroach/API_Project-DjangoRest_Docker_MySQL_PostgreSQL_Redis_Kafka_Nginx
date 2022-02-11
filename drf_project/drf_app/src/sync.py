@@ -1,9 +1,9 @@
 import datetime
 from rest_framework.response import Response
-from ..models import Post
+from ..models import Post, Author
 
 
-def sinc_posts(posts, ex_posts):
+def sync_posts(posts, ex_posts):
     result = {
         'Number of downloaded posts': 0,
         'Number of updated posts': 0,
@@ -48,3 +48,26 @@ def sync_authors(authors, ex_authors):
         authors = [authors]
 
     new_data = []
+    for post in authors:
+        try:
+            inst = list(filter(lambda item: getattr(item, 'id') == post['id'], ex_authors))[0]
+            for (key, value) in post.items():
+                setattr(inst, key, value)
+            inst.update_date = datetime.datetime.now()
+            result['Number of updated posts'] += 1
+            result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        except IndexError:
+            inst = Author()
+            for (key, value) in post.items():
+                setattr(inst, key, value)
+            inst.update_date = datetime.datetime.now()
+            new_data.append(inst)
+            result['Number of downloaded posts'] += 1
+            result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        except KeyError:
+            return Response(data="There is no data on the remote API server", status=400)
+
+    Post.objects.bulk_update_or_create(ex_authors, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
+    Post.objects.bulk_update_or_create(new_data, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
+
+    return Response(result)

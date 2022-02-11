@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from .models import Post, Author
 from .serializers import MirrorSerializer
 from .src.utils import download_json
-from .src.sync import sinc_posts
+from .src.sync import sync_posts, sync_authors
 
 posts_url = os.getenv('POSTS_API')
 authors_url = os.getenv('AUTHORS_API')
@@ -26,24 +26,24 @@ def mirror_text(request):
             return Response(serializer.data)
 
 
-class SinchPostView(APIView):
+class SyncPostView(APIView):
 
     def get(self, request):
         posts = download_json(posts_url)
         ex_posts = Post.objects.all()
         try:
-            return sinc_posts(posts, ex_posts)
+            return sync_posts(posts, ex_posts)
         except TypeError:
             return Response(str(posts.content).strip('\'b\''), status=400)
 
 
-class SinchAuthorView(APIView):
+class SyncAuthorView(APIView):
 
     def get(self, request):
         authors = download_json(authors_url)
         ex_authors = Author.objects.all()
         try:
-            return sinc_posts(authors, ex_authors)
+            return sync_authors(authors, ex_authors)
         except TypeError:
             return Response(str(authors.content).strip('\'b\''), status=400)
 
