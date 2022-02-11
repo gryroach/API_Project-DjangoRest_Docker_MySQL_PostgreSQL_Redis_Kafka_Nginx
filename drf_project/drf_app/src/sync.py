@@ -1,6 +1,7 @@
 import datetime
 from rest_framework.response import Response
-from ..models import Post, Author
+from ..models import Post, Author, Company, Address, Geo
+from ..serializers import AuthorSerializer
 
 
 def sync_posts(posts, ex_posts):
@@ -48,26 +49,31 @@ def sync_authors(authors, ex_authors):
         authors = [authors]
 
     new_data = []
-    for post in authors:
+    for author in authors:
         try:
-            inst = list(filter(lambda item: getattr(item, 'id') == post['id'], ex_authors))[0]
-            for (key, value) in post.items():
+            inst = list(filter(lambda item: getattr(item, 'id') == author['id'], ex_authors))[0]
+            for (key, value) in author.items():
                 setattr(inst, key, value)
             inst.update_date = datetime.datetime.now()
-            result['Number of updated posts'] += 1
+            result['Number of updated authors'] += 1
             result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         except IndexError:
-            inst = Author()
-            for (key, value) in post.items():
-                setattr(inst, key, value)
-            inst.update_date = datetime.datetime.now()
-            new_data.append(inst)
-            result['Number of downloaded posts'] += 1
+            serializer = AuthorSerializer(data=author)
+            if serializer.is_valid():
+                serializer.save()
+
+            # for (key, value) in author.items():
+            #     setattr(inst, key, value)
+            # inst.save()
+
+            # inst.update_date = datetime.datetime.now()
+            # new_data.append(inst)
+            result['Number of downloaded authors'] += 1
             result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         except KeyError:
             return Response(data="There is no data on the remote API server", status=400)
 
-    Post.objects.bulk_update_or_create(ex_authors, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
-    Post.objects.bulk_update_or_create(new_data, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
+    # Post.objects.bulk_update_or_create(ex_authors, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
+    # Post.objects.bulk_update_or_create(new_data, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
 
     return Response(result)

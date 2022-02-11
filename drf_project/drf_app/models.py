@@ -6,6 +6,8 @@ class Geo(models.Model):
     lat = models.IntegerField('Latitude')
     lng = models.IntegerField('Longitude')
 
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
+
 
 class Address(models.Model):
     street = models.CharField('Street', max_length=200)
@@ -14,11 +16,15 @@ class Address(models.Model):
     zipcode = models.CharField('Zipcode', max_length=200)
     geo = models.ForeignKey('Geo', on_delete=models.SET_NULL, verbose_name='Geo', null=True)
 
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
+
 
 class Company(models.Model):
     name = models.CharField('Name', max_length=200)
     catchPhrase = models.CharField('Catch phrase', max_length=200)
     bs = models.CharField(max_length=200)
+
+    objects = BulkUpdateOrCreateQuerySet.as_manager()
 
     class Meta:
         ordering = ["name"]
