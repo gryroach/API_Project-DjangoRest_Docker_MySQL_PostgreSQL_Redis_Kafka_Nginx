@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Author, Address, Company, Geo
+from django.utils import timezone
 
 
 class MirrorSerializer(serializers.Serializer):
@@ -21,6 +22,10 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+
+    # def create(self, validated_data):
+    #     return Company.objects.create(**validated_data)
+
     class Meta:
         model = Company
         fields = ('name', 'catchPhrase', 'bs')
@@ -30,6 +35,12 @@ class AuthorSerializer(serializers.ModelSerializer):
     address = serializers.RelatedField(source='Address', read_only=True)
     company = serializers.RelatedField(source='Company', read_only=True)
 
+    def create(self, validated_data):
+        instance = Author(**validated_data)
+        instance.update_date = timezone.now()
+        instance.save()
+        return instance
+
     class Meta:
         model = Author
-        fields = ('id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company')
+        fields = ('id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date')

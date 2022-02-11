@@ -1,12 +1,12 @@
 import django.utils.datastructures
 import os
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Post, Author
-from .serializers import MirrorSerializer
+from .serializers import MirrorSerializer, AuthorSerializer
 from .src.utils import download_json
 from .src.sync import sync_posts, sync_authors
 
@@ -46,5 +46,3 @@ class SyncAuthorView(APIView):
             return sync_authors(authors, ex_authors)
         except TypeError:
             return Response(str(authors.content).strip('\'b\''), status=400)
-
-

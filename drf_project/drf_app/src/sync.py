@@ -32,7 +32,6 @@ def sync_posts(posts, ex_posts):
             result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         except KeyError:
             return Response(data="There is no data on the remote API server", status=400)
-
     Post.objects.bulk_update_or_create(ex_posts, ['userId', 'title', 'body', 'update_date'], match_field='id')
     Post.objects.bulk_update_or_create(new_data, ['userId', 'title', 'body', 'update_date'], match_field='id')
 
@@ -60,8 +59,12 @@ def sync_authors(authors, ex_authors):
         except IndexError:
             serializer = AuthorSerializer(data=author)
             if serializer.is_valid():
-                serializer.save()
+                instance = Author(**serializer.validated_data)
+                print(instance)
+                print(serializer.validated_data)
 
+
+                new_data.append(instance)
             # for (key, value) in author.items():
             #     setattr(inst, key, value)
             # inst.save()
@@ -74,6 +77,7 @@ def sync_authors(authors, ex_authors):
             return Response(data="There is no data on the remote API server", status=400)
 
     # Post.objects.bulk_update_or_create(ex_authors, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
-    # Post.objects.bulk_update_or_create(new_data, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
+    print(new_data)
+    Author.objects.bulk_update_or_create(new_data, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
 
     return Response(result)
