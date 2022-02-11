@@ -3,8 +3,8 @@ from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 
 
 class Geo(models.Model):
-    lat = models.IntegerField('Latitude')
-    lng = models.IntegerField('Longitude')
+    lat = models.FloatField('Latitude')
+    lng = models.FloatField('Longitude')
 
     objects = BulkUpdateOrCreateQuerySet.as_manager()
 

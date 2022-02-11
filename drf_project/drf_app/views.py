@@ -45,4 +45,4 @@ class SyncAuthorView(APIView):
         try:
             return sync_authors(authors, ex_authors)
         except TypeError:
-            return Response(str(authors.content).strip('\'b\''), status=400)
+            return Response('error', status=400)
