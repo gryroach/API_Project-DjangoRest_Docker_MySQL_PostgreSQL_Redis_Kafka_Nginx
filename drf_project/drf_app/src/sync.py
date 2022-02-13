@@ -46,45 +46,50 @@ def sync_authors(authors, ex_authors):
     }
     if isinstance(authors, dict):
         authors = [authors]
-
     new_data = []
     for author in authors:
-        try:
-            inst = list(filter(lambda item: getattr(item, 'id') == author['id'], ex_authors))[0]
-            for (key, value) in author.items():
-                setattr(inst, key, value)
-            inst.update_date = datetime.datetime.now()
-            result['Number of updated authors'] += 1
-            result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        except IndexError:
-            serializer = AuthorSerializer(data=author)
+        serializer = AuthorSerializer(data=author)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
 
-            if serializer.is_valid(raise_exception=True):
-
-                # instance = Author(**serializer.validated_data)
-
-                print('!!!!!!!! before save')
-                print(serializer.validated_data)
-                serializer.save()
-                # serializer.save()
-
-                print('!!!!!!! after save')
-
-
-
-                # new_data.append(instance)
-            # for (key, value) in author.items():
-            #     setattr(inst, key, value)
-            # inst.save()
-
-            # inst.update_date = datetime.datetime.now()
-            # new_data.append(inst)
-            result['Number of downloaded authors'] += 1
-            result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        except KeyError:
-            return Response(data="There is no data on the remote API server", status=400)
+        # try:
+        #     serializer = AuthorSerializer(data=author)
+        #
+        #     if serializer.is_valid(raise_exception=True):
+        #         inst = list(filter(lambda item: getattr(item, 'id') == author['id'], ex_authors))[0]
+        #         serializer.create(serializer.validated_data)
+        #         # inst = Author(**serializer.validated_data)
+        #         # print(inst)
+        #         # inst.save()
+        #         # instance = Author(**serializer.validated_data)
+        #         # serializer.save()
+        #         # instance.save()
+        #
+        #         # Author.objects.update(**serializer.validated_data)
+        #     # inst = list(filter(lambda item: getattr(item, 'id') == author['id'], ex_authors))[0]
+        #     # for (key, value) in author.items():
+        #     #     setattr(inst, key, value)
+        #     # inst.update_date = datetime.datetime.now()
+        #     result['Number of updated authors'] += 1
+        #     result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        # except IndexError:
+        #     serializer = AuthorSerializer(data=author)
+        #
+        #     if serializer.is_valid(raise_exception=True):
+        #         serializer.save()
+        #         new_data.append(serializer.validated_data)
+        #     # for (key, value) in author.items():
+        #     #     setattr(inst, key, value)
+        #     # inst.save()
+        #
+        #     # inst.update_date = datetime.datetime.now()
+        #     # new_data.append(inst)
+        #     result['Number of downloaded authors'] += 1
+        #     result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        # except KeyError:
+        #     return Response(data="There is no data on the remote API server", status=400)
 
     # Post.objects.bulk_update_or_create(ex_authors, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
-    # Author.objects.bulk_update_or_create(new_data, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
-
+    # Author.objects.bulk_update_or_create(new_data, ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='username')
+    # Author.objects.bulk_create(new_data)
     return Response(result)

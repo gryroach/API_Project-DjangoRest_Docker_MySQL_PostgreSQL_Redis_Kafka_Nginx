@@ -20,7 +20,7 @@ class Address(models.Model):
 
 
 class Company(models.Model):
-    name = models.CharField('Name', max_length=200)
+    name = models.CharField('Name', max_length=200, unique=True)
     catchPhrase = models.CharField('Catch phrase', max_length=200)
     bs = models.CharField(max_length=200)
 
