@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Author, Address, Company, Geo
+from .models import Author, Address, Company, Geo, Post
 from django.utils import timezone
 
 
@@ -44,9 +44,26 @@ class CompanySerializer(serializers.ModelSerializer):
         }
 
 
+class PostSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Post
+        fields = ['userId', 'id', 'title', 'body', 'update_date']
+
+        extra_kwargs = {
+            'id': {'validators': []},
+        }
+
+    def create(self, validated_data):
+        instance = Post(**validated_data)
+        instance.update_date = timezone.now()
+        return instance
+
+
 class AuthorSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     company = CompanySerializer()
+    userId = PostSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         address_data = validated_data.pop('address', None)
@@ -77,7 +94,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date']
+        fields = ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date', 'userId']
 
         extra_kwargs = {
             'id': {'validators': []},

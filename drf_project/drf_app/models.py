@@ -48,7 +48,7 @@ class Author(models.Model):
 
 
 class Post(models.Model):
-    userId = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True)
+    userId = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True, related_name='userId')
     id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=240)
     body = models.TextField()

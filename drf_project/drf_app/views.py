@@ -34,7 +34,7 @@ class SyncPostView(APIView):
         try:
             return sync_posts(posts, ex_posts)
         except TypeError:
-            return Response(str(posts.content).strip('\'b\''), status=400)
+            return Response("Internal error. Unable to sync posts.", status=400)
 
 
 class SyncAuthorView(APIView):
@@ -45,4 +45,4 @@ class SyncAuthorView(APIView):
         try:
             return sync_authors(authors, ex_authors)
         except TypeError:
-            return Response('error', status=400)
+            return Response("Internal error. Unable to sync authors.", status=400)
