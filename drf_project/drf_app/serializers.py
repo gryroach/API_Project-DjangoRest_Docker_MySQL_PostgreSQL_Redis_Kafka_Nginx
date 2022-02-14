@@ -11,29 +11,26 @@ class MirrorSerializer(serializers.Serializer):
 
 class GeoSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        return Geo.objects.create(**validated_data)
-
     class Meta:
         model = Geo
         fields = ['lat', 'lng']
+
+    def create(self, validated_data):
+        return Geo.objects.create(**validated_data)
 
 
 class AddressSerializer(serializers.ModelSerializer):
     geo = GeoSerializer()
 
-    def create(self, validated_data):
-        return Address.objects.create(**validated_data)
-
     class Meta:
         model = Address
         fields = ['street', 'suite', 'city', 'zipcode', 'geo']
 
+    def create(self, validated_data):
+        return Address.objects.create(**validated_data)
+
 
 class CompanySerializer(serializers.ModelSerializer):
-
-    def create(self, validated_data):
-        return Company.objects.create(**validated_data)
 
     class Meta:
         model = Company
@@ -42,6 +39,9 @@ class CompanySerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'name': {'validators': [ValidationError]},
         }
+
+    def create(self, validated_data):
+        return Company.objects.create(**validated_data)
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -64,6 +64,14 @@ class AuthorSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     company = CompanySerializer()
     userId = PostSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Author
+        fields = ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date', 'userId']
+
+        extra_kwargs = {
+            'id': {'validators': []},
+        }
 
     def create(self, validated_data):
         address_data = validated_data.pop('address', None)
@@ -91,11 +99,3 @@ class AuthorSerializer(serializers.ModelSerializer):
         instance = Author(**validated_data)
         instance.update_date = timezone.now()
         return instance
-
-    class Meta:
-        model = Author
-        fields = ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date', 'userId']
-
-        extra_kwargs = {
-            'id': {'validators': []},
-        }
