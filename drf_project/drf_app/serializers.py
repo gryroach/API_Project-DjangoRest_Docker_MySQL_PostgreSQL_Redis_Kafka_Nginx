@@ -44,7 +44,6 @@ class CompanySerializer(serializers.ModelSerializer):
         }
 
 
-
 class AuthorSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     company = CompanySerializer()
@@ -53,24 +52,24 @@ class AuthorSerializer(serializers.ModelSerializer):
         address_data = validated_data.pop('address', None)
         geo_data = address_data.pop('geo', None)
         if geo_data:
-            geo = Geo.objects.create(**geo_data)
-            # geo = Geo(**geo_data)
-            # geo.save()
+            try:
+                geo = Geo.objects.get(lat=geo_data['lat'], lng=geo_data['lng'])
+            except Geo.DoesNotExist:
+                geo = Geo.objects.create(**geo_data)
             address_data['geo'] = geo
         if address_data:
-            address = Address.objects.create(**address_data)
-            # address = Address(**address_data)
-            # address.save()
+            try:
+                address = Address.objects.get(street=address_data['street'], suite=address_data['suite'],
+                                              city=address_data['city'], zipcode=address_data['zipcode'])
+            except Address.DoesNotExist:
+                address = Address.objects.create(**address_data)
             validated_data['address'] = address
         company_data = validated_data.pop('company', None)
         if company_data:
             try:
-                print('!!!!!!!!')
                 company = Company.objects.get(name=company_data['name'])
-            except:
+            except Company.DoesNotExist:
                 company = Company.objects.create(**company_data)
-            # company = Company(**company_data)
-            # company.save()
             validated_data['company'] = company
         instance = Author(**validated_data)
         instance.update_date = timezone.now()
