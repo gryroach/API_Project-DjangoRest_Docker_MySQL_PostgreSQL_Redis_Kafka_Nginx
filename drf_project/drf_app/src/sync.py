@@ -59,11 +59,9 @@ def sync_authors(authors, ex_authors):
                 result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 instance = serializer.create(validated_data=serializer.validated_data)
                 new_data.append(instance)
-                Author.objects.bulk_create(new_data)
 
-            # print(instance)
+    Author.objects.bulk_create(new_data)
 
-            #
 
     # Post.objects.bulk_update_or_create(ex_authors, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
     # Author.objects.bulk_update_or_create(new_data, ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='username')
