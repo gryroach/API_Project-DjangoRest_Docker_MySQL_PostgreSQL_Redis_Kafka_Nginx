@@ -73,7 +73,6 @@ class AuthorSerializer(serializers.ModelSerializer):
             validated_data['company'] = company
         instance = Author(**validated_data)
         instance.update_date = timezone.now()
-        # instance.save()
         return instance
 
     class Meta:

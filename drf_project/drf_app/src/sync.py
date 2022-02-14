@@ -47,24 +47,25 @@ def sync_authors(authors, ex_authors):
     if isinstance(authors, dict):
         authors = [authors]
     new_data = []
+    update_data = []
     for author in authors:
         serializer = AuthorSerializer(data=author)
         if serializer.is_valid(raise_exception=True):
             try:
-                inst = list(filter(lambda item: getattr(item, 'id') == author['id'], ex_authors))[0]
+                ex_inst = list(filter(lambda item: getattr(item, 'id') == author['id'], ex_authors))[0]
                 result['Number of updated authors'] += 1
-                serializer.save()
+                update_data.append(serializer.create(validated_data=serializer.validated_data))
             except IndexError:
                 result['Number of downloaded authors'] += 1
                 result['Last update'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                instance = serializer.create(validated_data=serializer.validated_data)
-                new_data.append(instance)
+                new_data.append(serializer.create(validated_data=serializer.validated_data))
 
     Author.objects.bulk_create(new_data)
+    Author.objects.bulk_update([Author(id=values.id, name=values.name, username=values.username,
+                                      email=values.email, phone=values.phone,
+                                      website=values.website, address=values.address,
+                                      company=values.company, update_date=values.update_date)
+                               for values in update_data], ['name', 'username', 'email', 'phone', 'website',
+                                                            'address', 'company', 'update_date'], batch_size=1000)
 
-
-    # Post.objects.bulk_update_or_create(ex_authors, ['name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='id')
-    # Author.objects.bulk_update_or_create(new_data, ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date'], match_field='username')
-
-    # Author.objects.bulk_update(new_data)
     return Response(result)
