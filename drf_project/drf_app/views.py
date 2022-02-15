@@ -60,7 +60,8 @@ class AuthorListView(APIView):
     def post(self, request, format=None):
         serializer = AuthorSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            instance = serializer.create(serializer.validated_data)
+            instance.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -82,7 +83,9 @@ class AuthorDetailView(APIView):
         author = self.get_object(pk)
         serializer = AuthorSerializer(author, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            instance = serializer.create(serializer.validated_data)
+            Author.objects.bulk_update([instance], ['name', 'username', 'email', 'phone', 'website', 'address',
+                                                    'company', 'update_date'], batch_size=1)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
