@@ -44,30 +44,17 @@ class CompanySerializer(serializers.ModelSerializer):
         return Company.objects.create(**validated_data)
 
 
-class PostSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Post
-        fields = ['userId', 'id', 'title', 'body', 'update_date']
-
-        extra_kwargs = {
-            'id': {'validators': []},
-        }
-
-    def create(self, validated_data):
-        instance = Post(**validated_data)
-        instance.update_date = timezone.now()
-        return instance
 
 
 class AuthorSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     company = CompanySerializer()
-    userId = PostSerializer(many=True, read_only=True)
+    # userId = PostSerializer(many=True, read_only=True)
 
     class Meta:
         model = Author
-        fields = ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date', 'userId']
+        fields = ['id', 'name', 'username', 'email', 'phone', 'website', 'address', 'company', 'update_date']
 
         extra_kwargs = {
             'id': {'validators': []},
@@ -97,5 +84,22 @@ class AuthorSerializer(serializers.ModelSerializer):
                 company = Company.objects.create(**company_data)
             validated_data['company'] = company
         instance = Author(**validated_data)
+        instance.update_date = timezone.now()
+        return instance
+
+
+class PostSerializer(serializers.ModelSerializer):
+    userId = AuthorSerializer().data['id']
+
+    class Meta:
+        model = Post
+        fields = ['userId', 'id', 'title', 'body', 'update_date']
+
+        extra_kwargs = {
+            'id': {'validators': []},
+        }
+
+    def create(self, validated_data):
+        instance = Post(**validated_data)
         instance.update_date = timezone.now()
         return instance
