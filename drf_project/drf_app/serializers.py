@@ -44,13 +44,9 @@ class CompanySerializer(serializers.ModelSerializer):
         return Company.objects.create(**validated_data)
 
 
-
-
-
 class AuthorSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     company = CompanySerializer()
-    # userId = PostSerializer(many=True, read_only=True)
 
     class Meta:
         model = Author
