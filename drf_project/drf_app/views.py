@@ -2,7 +2,7 @@ import django.utils.datastructures
 import os
 
 from django.http import Http404
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -52,6 +52,8 @@ class SyncAuthorView(APIView):
 
 class AuthorListView(APIView):
 
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, format=None):
         snippets = Author.objects.all()
         serializer = AuthorSerializer(snippets, many=True)
@@ -67,6 +69,8 @@ class AuthorListView(APIView):
 
 
 class AuthorDetailView(APIView):
+
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self, pk):
         try:

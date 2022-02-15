@@ -14,3 +14,4 @@ sqlparse==0.4.2
 urllib3==1.26.7
 
 django-mysql==3.8.1
+djoser==2.1.0

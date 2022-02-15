@@ -6,5 +6,5 @@ urlpatterns = [
     path('post/sync', SyncPostView.as_view()),
     path('author/sync', SyncAuthorView.as_view()),
     path('author/', AuthorListView.as_view()),
-    path('author/<int:pk>/', AuthorDetailView.as_view())
+    path('author/<int:pk>/', AuthorDetailView.as_view()),
 ]
