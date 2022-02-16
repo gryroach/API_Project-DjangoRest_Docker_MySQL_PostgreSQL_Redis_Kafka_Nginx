@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from .models import Post, Author
 from .serializers import MirrorSerializer, AuthorSerializer
 from .src.utils import download_json
-from .src.sync import sync_posts, sync_authors
+from .src.sync import sync_objects
 
 posts_url = os.getenv('POSTS_API')
 authors_url = os.getenv('AUTHORS_API')
@@ -34,7 +34,7 @@ class SyncPostView(APIView):
         posts = download_json(posts_url)
         ex_posts = Post.objects.all()
         try:
-            return sync_posts(posts, ex_posts)
+            return sync_objects(posts, ex_posts, type_object='posts')
         except TypeError:
             return Response("Internal error. Unable to sync posts.", status=400)
 
@@ -45,7 +45,7 @@ class SyncAuthorView(APIView):
         authors = download_json(authors_url)
         ex_authors = Author.objects.all()
         try:
-            return sync_authors(authors, ex_authors)
+            return sync_objects(authors, ex_authors, type_object='authors')
         except TypeError:
             return Response("Internal error. Unable to sync authors.", status=400)
 
