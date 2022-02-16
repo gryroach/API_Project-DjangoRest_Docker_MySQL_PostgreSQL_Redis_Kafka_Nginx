@@ -1,5 +1,7 @@
 import datetime
 from rest_framework.response import Response
+from django.core.cache import cache
+
 from ..models import Post, Author
 from ..serializers import AuthorSerializer, PostSerializer
 
@@ -44,5 +46,8 @@ def sync_objects(obj, ex_obj, type_object):
                                            company=values.company, update_date=values.update_date)
                                     for values in update_data], ['name', 'username', 'email', 'phone', 'website',
                                                                  'address', 'company', 'update_date'], batch_size=1000)
+        cache.delete('authors')
+        for author in new_data + update_data:
+            cache.delete(f'author {author.id}')
 
     return Response(result)

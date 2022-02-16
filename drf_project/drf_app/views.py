@@ -94,13 +94,13 @@ class AuthorDetailView(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        if 'author' in cache:
-            author = cache.get('author')
+        if f'author {pk}' in cache:
+            author = cache.get(f'author {pk}')
             return Response(author, status=200)
         else:
             author = self.get_object(pk)
             serializer = AuthorSerializer(author)
-            cache.set('author', serializer.data, timeout=CACHE_TTL)
+            cache.set(f'author {pk}', serializer.data, timeout=CACHE_TTL)
             return Response(serializer.data)
 
     def put(self, request, pk, format=None):
