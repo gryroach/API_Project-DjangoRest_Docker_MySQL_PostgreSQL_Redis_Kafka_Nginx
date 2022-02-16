@@ -6,6 +6,9 @@ from rest_framework import status, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.core.cache import cache
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 from .models import Post, Author
 from .serializers import MirrorSerializer, AuthorSerializer
@@ -14,6 +17,7 @@ from .src.sync import sync_objects
 
 posts_url = os.getenv('POSTS_API')
 authors_url = os.getenv('AUTHORS_API')
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
 @api_view(['GET'])
@@ -61,9 +65,14 @@ class AuthorListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
-        snippets = Author.objects.all()
-        serializer = AuthorSerializer(snippets, many=True)
-        return Response(serializer.data)
+        if 'authors' in cache:
+            authors = cache.get('authors')
+            return Response(authors, status=200)
+        else:
+            authors = Author.objects.all()
+            serializer = AuthorSerializer(authors, many=True)
+            cache.set('authors', serializer.data, timeout=CACHE_TTL)
+            return Response(serializer.data)
 
     def post(self, request, format=None):
         serializer = AuthorSerializer(data=request.data)
@@ -85,9 +94,14 @@ class AuthorDetailView(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        author = self.get_object(pk)
-        serializer = AuthorSerializer(author)
-        return Response(serializer.data)
+        if 'author' in cache:
+            author = cache.get('author')
+            return Response(author, status=200)
+        else:
+            author = self.get_object(pk)
+            serializer = AuthorSerializer(author)
+            cache.set('author', serializer.data, timeout=CACHE_TTL)
+            return Response(serializer.data)
 
     def put(self, request, pk, format=None):
         author = self.get_object(pk)
