@@ -31,7 +31,10 @@ def mirror_text(request):
 class SyncPostView(APIView):
 
     def get(self, request):
-        posts = download_json(posts_url)
+        try:
+            posts = download_json(posts_url)
+        except Exception as er:
+            return Response({'error': str(er)}, status=400)
         ex_posts = Post.objects.all()
         try:
             return sync_objects(posts, ex_posts, type_object='posts')
@@ -42,7 +45,10 @@ class SyncPostView(APIView):
 class SyncAuthorView(APIView):
 
     def get(self, request):
-        authors = download_json(authors_url)
+        try:
+            authors = download_json(authors_url)
+        except Exception as er:
+            return Response({'error': str(er)}, status=400)
         ex_authors = Author.objects.all()
         try:
             return sync_objects(authors, ex_authors, type_object='authors')
