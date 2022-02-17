@@ -14,6 +14,7 @@ from .models import Post, Author
 from .serializers import MirrorSerializer, AuthorSerializer
 from .src.utils import download_json
 from .src.sync import sync_objects
+from .src.kafka_producer import producer
 
 posts_url = os.getenv('POSTS_API')
 authors_url = os.getenv('AUTHORS_API')
@@ -41,7 +42,9 @@ class SyncPostView(APIView):
             return Response({'error': str(er)}, status=400)
         ex_posts = Post.objects.all()
         try:
-            return sync_objects(posts, ex_posts, type_object='posts')
+            response = sync_objects(posts, ex_posts, type_object='posts')
+            producer.send('topic_sync', value='sync posts')
+            return response
         except TypeError:
             return Response("Internal error. Unable to sync posts.", status=400)
 
