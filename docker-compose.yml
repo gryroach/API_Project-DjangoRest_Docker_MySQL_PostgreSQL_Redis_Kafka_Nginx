@@ -5,6 +5,19 @@ services:
     image: redis:latest
     ports:
       - '6379:6379'
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7.37
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: db_django
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+    volumes:
+      - ./db_django:/var/lib/mysql
   web:
       build:
         context: ./drf_project
@@ -20,15 +33,27 @@ services:
         - db
       links:
         - redis
-  db:
-    image: mysql:5.7.37
-    ports:
-      - '3306:3306'
-    environment:
-      MYSQL_DATABASE: db_django
-      MYSQL_USER: user
-      MYSQL_PASSWORD: 123
-      MYSQL_ROOT_PASSWORD: root
-    restart: always
+  dblogs:
+    image: postgres:13.0-alpine
     volumes:
-      - ./db_django:/var/lib/mysql
+      - ./db_logs:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_NAME: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+  logs:
+    build:
+      context: ./django_logs
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env.logs
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./django_logs:/src
+    ports:
+      - "8001:8000"
+    depends_on:
+      - dblogs
