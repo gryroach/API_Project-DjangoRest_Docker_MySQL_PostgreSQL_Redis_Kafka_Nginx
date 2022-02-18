@@ -2,42 +2,33 @@ version: '3.8'
 
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
+    image: wurstmeister/zookeeper
     container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  broker:
-    image: confluentinc/cp-kafka:7.0.1
-    container_name: broker
     ports:
-    # To learn about configuring Kafka for access across networks see
-    # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+      - "2181:2181"
+      -
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
       - "9092:9092"
+    expose:
+      - "9093"
     depends_on:
       - zookeeper
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    restart: "no"
-    ports:
-      - "9000:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "broker:9092"
-    depends_on:
-      - broker
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "topic_sync:1:1"
+
   redis:
     image: redis:latest
     ports:
       - '6379:6379'
+
   db:
     platform: linux/x86_64
     image: mysql:5.7.37
@@ -51,6 +42,7 @@ services:
     restart: always
     volumes:
       - ./db_django:/var/lib/mysql
+
   web:
       build:
         context: ./drf_project
@@ -60,12 +52,18 @@ services:
         - ./drf_project:/src
       ports:
         - "8000:8000"
+      expose:
+        - "9092"
+        - "9093"
       env_file:
         - ./.env
       depends_on:
         - db
+        - kafka
       links:
         - redis
+        - kafka
+
   dblogs:
     image: postgres:13.0-alpine
     volumes:
@@ -77,6 +75,7 @@ services:
       POSTGRES_NAME: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
   logs:
     build:
       context: ./django_logs

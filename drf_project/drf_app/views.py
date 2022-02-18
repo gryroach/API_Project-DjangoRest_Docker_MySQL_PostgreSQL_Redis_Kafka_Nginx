@@ -44,6 +44,7 @@ class SyncPostView(APIView):
         try:
             response = sync_objects(posts, ex_posts, type_object='posts')
             producer.send('topic_sync', value='sync posts')
+            producer.flush()
             return response
         except TypeError:
             return Response("Internal error. Unable to sync posts.", status=400)
@@ -58,7 +59,10 @@ class SyncAuthorView(APIView):
             return Response({'error': str(er)}, status=400)
         ex_authors = Author.objects.all()
         try:
-            return sync_objects(authors, ex_authors, type_object='authors')
+            response = sync_objects(authors, ex_authors, type_object='authors')
+            producer.send('topic_sync', value='sync authors')
+            producer.flush()
+            return response
         except TypeError:
             return Response("Internal error. Unable to sync authors.", status=400)
 
