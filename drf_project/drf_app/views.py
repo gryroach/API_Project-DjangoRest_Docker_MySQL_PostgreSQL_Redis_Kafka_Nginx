@@ -15,7 +15,7 @@ from .models import Post, Author
 from .serializers import MirrorSerializer, AuthorSerializer
 from .src.utils import download_json
 from .src.sync import sync_objects
-from .src.kafka_producer import producer, consumer
+from .src.kafka_producer import producer
 
 posts_url = os.getenv('POSTS_API')
 authors_url = os.getenv('AUTHORS_API')
@@ -25,15 +25,13 @@ CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 @api_view(['GET'])
 def mirror_text(request):
     if request.method == 'GET':
-        # try:
-        #     text = {'text': request.GET['text']}
-        # except django.utils.datastructures.MultiValueDictKeyError:
-        #     return Response(status=status.HTTP_400_BAD_REQUEST)
-        # serializer = MirrorSerializer(data=text)
-        # if serializer.is_valid():
-        #     return Response(serializer.data)
-        response = requests.get('http://logs:8001/hello/')
-        return response.text
+        try:
+            text = {'text': request.GET['text']}
+        except django.utils.datastructures.MultiValueDictKeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = MirrorSerializer(data=text)
+        if serializer.is_valid():
+            return Response(serializer.data)
 
 
 class SyncPostView(APIView):
@@ -46,11 +44,7 @@ class SyncPostView(APIView):
         ex_posts = Post.objects.all()
         try:
             response = sync_objects(posts, ex_posts, type_object='posts')
-            producer.send('sync', value=bytes('sync posts'))
-            producer.flush()
-            # for event in consumer:
-            #     print(event.value)
-            # consumer.close()
+            producer.send('sync', 'sync post')
             return response
         except TypeError:
             return Response("Internal error. Unable to sync posts.", status=400)
@@ -66,8 +60,8 @@ class SyncAuthorView(APIView):
         ex_authors = Author.objects.all()
         try:
             response = sync_objects(authors, ex_authors, type_object='authors')
-            producer.send('sync', value=bytes('sync authors'))
-            producer.flush()
+            # producer.send('sync', value=bytes('sync authors'))
+            # producer.flush()
             return response
         except TypeError:
             return Response("Internal error. Unable to sync authors.", status=400)

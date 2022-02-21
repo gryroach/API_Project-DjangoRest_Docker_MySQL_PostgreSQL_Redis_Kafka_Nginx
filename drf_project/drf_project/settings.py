@@ -32,8 +32,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
 
 # ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(' ')
-ALLOWED_HOSTS = ['127.0.0.1', 'logs']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'logs', 'kafka']
 # Application definition
 
 INSTALLED_APPS = [

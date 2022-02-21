@@ -1,28 +1,6 @@
 version: '3.8'
 
 services:
-  zookeeper:
-    image: wurstmeister/zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    networks:
-      - project
-  kafka1:
-    image: wurstmeister/kafka
-    container_name: kafka1
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka1
-      KAFKA_ADVERTISED_PORT: 9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "sync:1:1"
-    networks:
-      - project
-
   redis:
     image: redis:latest
     ports:
@@ -58,55 +36,18 @@ services:
         - "8000:8000"
       expose:
         - "9092"
+        - "9093"
         - "8001"
       env_file:
         - ./.env
       depends_on:
         - db
-        - kafka1
-        - logs
       links:
         - redis
-        - kafka1
-        - logs:logs
       networks:
         - project
-
-  dblogs:
-    image: postgres:13.0-alpine
-    volumes:
-      - ./db_logs:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    restart: always
-    environment:
-      POSTGRES_NAME: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    networks:
-      - project
-
-  logs:
-    build:
-      context: ./django_logs
-      dockerfile: Dockerfile
-    container_name: logs
-    env_file:
-      - ./.env.logs
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - ./django_logs:/src
-    expose:
-      - "9092"
-      - "8001"
-    ports:
-      - "8001:8000"
-    depends_on:
-      - dblogs
-    networks:
-      - project
 
 networks:
   project:
     name: project
-    driver: bridge
+    external: True
