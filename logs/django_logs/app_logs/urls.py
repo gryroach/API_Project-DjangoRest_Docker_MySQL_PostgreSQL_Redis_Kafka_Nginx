@@ -1,9 +1,6 @@
 from django.urls import path
-from .views import first, second, third, four
-
+# from .views import first, second, third, four
+from .views import first
 urlpatterns = [
-    path('1/', first),
-    path('2/', second),
-    path('3/', third),
-    path('4/', four)
+    path('1/', first)
 ]
