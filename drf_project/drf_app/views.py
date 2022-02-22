@@ -44,7 +44,7 @@ class SyncPostView(APIView):
         ex_posts = Post.objects.all()
         try:
             response = sync_objects(posts, ex_posts, type_object='posts')
-            producer.send('sync', 'sync post2')
+            producer.send('sync', 'sync post')
             return response
         except TypeError:
             return Response("Internal error. Unable to sync posts.", status=400)
