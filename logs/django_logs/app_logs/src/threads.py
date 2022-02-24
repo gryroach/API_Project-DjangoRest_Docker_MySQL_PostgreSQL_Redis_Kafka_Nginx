@@ -12,4 +12,4 @@ def waiting_messages():
             record.save()
 
 
-thread_log = Thread(target=waiting_messages())
+# thread_log = Thread(target=waiting_messages())
