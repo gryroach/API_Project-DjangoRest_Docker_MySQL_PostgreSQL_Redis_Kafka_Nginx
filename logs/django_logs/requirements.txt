@@ -3,3 +3,6 @@ djangorestframework==3.13.1
 kafka-python==2.0.2
 pykafka==2.8.0
 psycopg2-binary==2.9.3
+# uWSGI>=2.0.19,<2.1
+
+gunicorn==20.1.0

@@ -55,16 +55,26 @@ services:
     container_name: logs
     env_file:
       - .env.logs
-    command: python manage.py runserver 0.0.0.0:8000
+#    command: python manage.py runserver 0.0.0.0:8000
+#    command: uwsgi --socket :8000 --master --enable-threads --module django_logs.wsgi
+    command: gunicorn django_logs.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./django_logs:/src
     expose:
       - "9092"
-      - "8001"
+      - "8000"
     ports:
-      - "8001:8000"
+      - "8000:8000"
     depends_on:
       - dblogs
+    networks:
+      - project
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - logs
     networks:
       - project
 
