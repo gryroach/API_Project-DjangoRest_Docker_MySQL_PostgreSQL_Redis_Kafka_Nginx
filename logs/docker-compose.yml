@@ -62,9 +62,9 @@ services:
       - ./django_logs:/src
     expose:
       - "9092"
-      - "8000"
+      - "8001"
     ports:
-      - "8000:8000"
+      - "8001:8000"
     depends_on:
       - dblogs
     networks:

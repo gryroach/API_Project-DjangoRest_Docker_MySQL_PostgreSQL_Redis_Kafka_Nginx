@@ -20,3 +20,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app_logs.urls')),
 ]
+
+# from logs.django_logs.app_logs.src.threads import thread_log
+#
+# print('!!!!!!!!')
+# thread_log.daemon = True
+# thread_log.start()
+# print('Thread is run')
