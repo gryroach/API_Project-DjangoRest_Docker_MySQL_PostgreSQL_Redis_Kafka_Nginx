@@ -10,7 +10,7 @@ from .src.threads import CreateLogsThread
 @api_view(['GET'])
 def first(request):
     if request.method == 'GET':
-        # CreateLogsThread().start()
+        CreateLogsThread().start()
         # for message in balanced_consumer:
         #     if message is not None:
         #         print(message.offset, message.value.decode("utf-8"))

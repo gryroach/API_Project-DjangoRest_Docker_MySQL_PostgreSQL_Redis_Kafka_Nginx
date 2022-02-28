@@ -28,11 +28,11 @@ class CreateLogsThread(Thread):
     def run(self):
         try:
             print('Thread execution started')
-            # while True:
-            #     for message in balanced_consumer:
-            #         if message is not None:
-            #             print(message.offset, message.value.decode("utf-8"))
-            #             record = LogRecord(timestamp=timezone.now(), type_of_sync=message.value.decode("utf-8"))
-            #             record.save()
+            while True:
+                for message in balanced_consumer:
+                    if message is not None:
+                        print(message.offset, message.value.decode("utf-8"))
+                        record = LogRecord(timestamp=timezone.now(), type_of_sync=message.value.decode("utf-8"))
+                        record.save()
         except Exception as e:
             print(e)
