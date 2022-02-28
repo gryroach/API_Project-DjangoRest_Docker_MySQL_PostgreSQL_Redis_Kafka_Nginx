@@ -30,7 +30,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-
     networks:
       - project
 
@@ -59,12 +58,14 @@ services:
 #    command: uwsgi --socket :8000 --master --enable-threads --module django_logs.wsgi
     command: gunicorn django_logs.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - ./django_logs:/src
+      - ./django_logs/django_logs:/src/django_logs
+      - ./django_logs/app_logs:/src/app_logs
+      - static_volume:/src/staticfiles
     expose:
       - "9092"
-      - "8001"
-    ports:
-      - "8001:8000"
+      - "8000"
+#    ports:
+#      - "8000:8000"
     depends_on:
       - dblogs
     networks:
@@ -75,6 +76,8 @@ services:
       - 1337:80
     depends_on:
       - logs
+    volumes:
+      - static_volume:/src/staticfiles
     networks:
       - project
 
@@ -82,3 +85,6 @@ networks:
   project:
     name: project
     driver: bridge
+
+volumes:
+  static_volume:

@@ -6,6 +6,7 @@ COPY app_logs src/app_logs
 COPY django_logs src/django_logs
 COPY manage.py src/
 COPY entrypoint.sh src/
+RUN mkdir -p src/staticfiles
 
 
 # set work directory
@@ -20,6 +21,6 @@ ENV PYTHONUNBUFFERED 1
 RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-
+#python manage.py collectstatic --no-input --clear
 #CMD ["/src/entrypoint.sh"]
-#ENTRYPOINT ["sh", "/src/entrypoint.sh"]
+CMD ["sh", "/src/entrypoint.sh"]
