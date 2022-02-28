@@ -11,15 +11,6 @@ from .src.threads import CreateLogsThread
 def first(request):
     if request.method == 'GET':
         CreateLogsThread().start()
-        # for message in balanced_consumer:
-        #     if message is not None:
-        #         print(message.offset, message.value.decode("utf-8"))
-        #         record = LogRecord(timestamp=timezone.now(), type_of_sync=message.value.decode("utf-8"))
-        #         record.save()
-        # thread_log.daemon = True
-        # thread_log.start()
-
-        # return Response(str(client.topics))
 
         return Response(str('ok'))
 

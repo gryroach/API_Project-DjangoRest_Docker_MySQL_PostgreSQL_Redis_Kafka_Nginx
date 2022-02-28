@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-# from .src.threads import thread_log
+# from .src.threads import CreateLogsThread
 
 
 class AppLogsConfig(AppConfig):
@@ -8,5 +8,5 @@ class AppLogsConfig(AppConfig):
 
     # def ready(self):
     #     print('!!!!!!!!')
-    #     # thread_log()
+    #     CreateLogsThread().start()
     #     print('Thread is run')

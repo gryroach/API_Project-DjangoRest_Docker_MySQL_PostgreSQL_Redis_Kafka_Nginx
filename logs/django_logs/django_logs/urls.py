@@ -21,6 +21,18 @@ urlpatterns = [
     path('', include('app_logs.urls')),
 ]
 
+import sys
+sys.path.append(".")
+
+import os
+print(os.getcwd())
+
+from app_logs.src.threads import CreateLogsThread
+
+
+
+CreateLogsThread().start()
+
 # from logs.django_logs.app_logs.src.threads import thread_log
 #
 # print('!!!!!!!!')
