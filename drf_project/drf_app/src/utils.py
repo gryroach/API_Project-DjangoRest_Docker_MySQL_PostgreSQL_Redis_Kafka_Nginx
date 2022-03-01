@@ -1,8 +1,6 @@
 import requests
 from json import JSONDecodeError
 
-from django.http import HttpResponseBadRequest
-
 
 def download_json(url):
     try:
