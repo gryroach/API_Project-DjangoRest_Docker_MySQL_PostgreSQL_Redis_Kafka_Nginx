@@ -13,11 +13,8 @@ services:
     image: mysql:5.7.37
     ports:
       - '3306:3306'
-    environment:
-      MYSQL_DATABASE: db_django
-      MYSQL_USER: user
-      MYSQL_PASSWORD: 123
-      MYSQL_ROOT_PASSWORD: root
+    env_file:
+      - ./.env
     restart: always
     volumes:
       - ./db_django:/var/lib/mysql
