@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.8.10
+FROM python:3.9
 
 # copy project
 COPY ./drf_app src/drf_app
@@ -15,6 +15,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install dependencies
-RUN pip install --upgrade pip
+RUN apt update
+RUN apt-get install -y netcat
+
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
+
+ENTRYPOINT [ "/bin/bash", "entrypoint.sh"]

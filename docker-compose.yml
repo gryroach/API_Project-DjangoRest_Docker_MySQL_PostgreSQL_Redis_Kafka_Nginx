@@ -29,7 +29,8 @@ services:
         context: ./drf_project
         dockerfile: Dockerfile
       container_name: web
-      command: python manage.py runserver 0.0.0.0:8000
+#      entrypoint: ["./entrypoint.sh"]
+#      command: python manage.py runserver 0.0.0.0:8000
       volumes:
         - ./drf_project:/src
       ports:
