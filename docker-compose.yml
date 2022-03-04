@@ -29,8 +29,6 @@ services:
         context: ./drf_project
         dockerfile: Dockerfile
       container_name: web
-#      entrypoint: ["./entrypoint.sh"]
-#      command: python manage.py runserver 0.0.0.0:8000
       volumes:
         - ./drf_project:/src
       ports:
@@ -38,7 +36,6 @@ services:
       expose:
         - "9092"
         - "9093"
-        - "8001"
       env_file:
         - ./.env
       depends_on:
