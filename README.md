@@ -33,6 +33,13 @@ $ git clone https://github.com/gryroach/API_Project-DjangoRest_Docker_MySQL_Post
 $ cd API_Project-DjangoRest_Docker_MySQL_PostgreSQL_Radis_Kafka_Nginx
 ```
 
+Create a virtual environment to install dependencies in and activate it:
+```sh
+$ pip install virtualenv
+$ python3 -m venv env
+$ source env/bin/activate
+```
+
 Install the dependencies for django project:
 ```sh
 (env)$ pip install -r ./drf_project/requirements.txt
@@ -55,21 +62,21 @@ The .env files already exist for the example, but you can change them:
 After that, start the logs docker-compose to run kafka broker and log-server:
 
 ```sh
-docker-compose -f logs/docker-compose.yml up --build -d
+(env)$ docker-compose -f logs/docker-compose.yml up --build -d
 ```
 When the log-server will be started, run projects docker-compose file:
 ```sh
-docker-compose -f docker-compose.yml up --build -d
+(env)$ docker-compose -f docker-compose.yml up --build -d
 ```
 
 Create superusers for project:
 ```sh
-docker-compose exec web python manage.py createsuperuser
+(env)$ docker-compose exec web python manage.py createsuperuser
 ```
 Create superusers for log:
 ```sh
-cd logs
-docker-compose exec logs python manage.py createsuperuser
+(env)$ cd logs
+(env)$ docker-compose exec logs python manage.py createsuperuser
 ```
 
 ## Work
