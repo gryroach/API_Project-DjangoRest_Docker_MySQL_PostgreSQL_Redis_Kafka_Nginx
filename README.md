@@ -69,7 +69,7 @@ docker-compose exec web python manage.py createsuperuser
 Create superusers for log:
 ```sh
 cd logs
-docker-compose exec web python manage.py createsuperuser
+docker-compose exec logs python manage.py createsuperuser
 ```
 
 ## Work
