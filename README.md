@@ -1,5 +1,5 @@
-# API_Project-DjangoRest_Docker_MySQL_PostgreSQL_Radis_Kafka_Nginx
-Django REST framework project for administration of posts from open API.
+# API_Project-DjangoRest_Docker_MySQL_PostgreSQL_Redis_Kafka_Nginx
+Django REST framework project for administration and synchronization of posts from open API.
 
 ## Functionality
 - synchronization of posts from open API
